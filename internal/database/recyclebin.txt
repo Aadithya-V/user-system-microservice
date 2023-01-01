@@ -1,0 +1,36 @@
+// interface DB specifies common database operations/methods used in the project
+// Advanced database specific  operations can be used directly in package main
+// but at the cost of high-coupling. In such cases, specify such operations as comments below.
+type DataBase interface {
+	//WARNING: interface not yet stable.
+	Set(key, val string) error
+	Get(key string) (string, error)
+}
+
+
+// Redis specific advanced operations are defined here.
+// These are not part of interface DB.
+
+// DB holds a pointer to the client created by the redis package-
+// in this case the go-redis package's *redis.Client.
+// Implements interface DB.
+// DB (together with interface DataBase) used to decouple underlying specific database clients.
+type DB struct {
+	Client *redis.Client
+}
+
+
+/*
+	The following functions implement DataBase interface.
+	They define standard operations on basic data structures. New ones added as and when seen fit.
+	Advanced operations should directly be executed using DB.Client in calling program.
+*/
+
+/* func (db *DB) Set(key string, val interface{}) error{
+	//return db.Client.Set()
+} */
+
+func (db *DB) Get(key string) (string, error) {
+
+	return db.Client.Get(ctx, key).Result()
+}

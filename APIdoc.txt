@@ -1,0 +1,46 @@
+
+## Auth- logins existing user or creates new user. Returns id, auth. 
+POST api/users/:name/:pwd
+
+## login- Posts username and pwd. Returns auth token
+POST api/login
+use-
+
+## Get all users
+GET api/users
+
+## Get user
+GET api/users/:id
+
+## Create new user
+POST api/users
+
+## Update user
+PUT api/users/:id
+
+## Delete current user
+DELETE api/users 
+
+## Delete specified user
+DELETE api/users/:id
+
+## Follow user
+api/follow/:id
+
+## Unfollow user
+api/unfollow/:id
+
+## Get all following of current user
+GET api/following
+
+## Get all following of specified user
+GET api/following/:id 
+
+## Get all followers of current user 
+GET api/followers
+
+## Get all folowers of specified user
+GET api/followers/:id
+
+## Logout- Posts auth token. 
+POST api/logout
