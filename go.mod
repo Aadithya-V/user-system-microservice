@@ -1,4 +1,4 @@
-module github.com/Aadithya-V/users-system
+module github.com/Aadithya-V/user-system-microservice
 
 go 1.19
 

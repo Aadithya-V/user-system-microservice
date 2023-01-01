@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/Aadithya-V/users-system/internal/database"
+	"github.com/Aadithya-V/user-system-microservice/internal/database"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
 )
