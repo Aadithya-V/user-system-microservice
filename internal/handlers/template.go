@@ -5,6 +5,7 @@ import (
 	"github.com/go-redis/redis/v9"
 )
 
+// Closure
 func name(db *redis.Client) func(ctx *gin.Context) {
 	fx := func(ctx *gin.Context) {
 

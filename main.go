@@ -46,11 +46,9 @@ func initRouter(db *redis.Client) *gin.Engine {
 	router := gin.Default()
 
 	// Routes mapping
-	//router.POST("/register", controllers.PostRegister)
-
 	router.POST("/register", handlers.Register(db))
 	router.POST("/login", handlers.Login(db))
-	//router.GET("/logout", handlers.Logout(db))
+	router.POST("/logout", handlers.Logout(db))
 
 	return router
 }
