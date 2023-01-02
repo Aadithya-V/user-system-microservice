@@ -18,19 +18,17 @@ func Logout(db *redis.Client) func(ctx *gin.Context) {
 			return //no cookie received
 		}
 
-		res := db.HGet(CTX, "auths", token)
-		if res.Err() != nil {
+		id, err := db.HGet(CTX, "auths", token).Result()
+		if err != nil { //auth doesnt exist
 			ctx.JSON(http.StatusUnauthorized, &gin.H{"err": "wrong auth credential."})
-			return //auth doesnt exist
+			return
 		}
-
-		id := res.Val()
 		// logout by deleting auth entries in db
 		db.HDel(CTX, "auths", token)
 		db.HDel(CTX, "user:"+id, "auth")
 		// delete cookie
 		ctx.SetCookie("auth", "", int(time.Unix(0, 0).Unix()), "", "", false, false)
-		ctx.JSON(http.StatusAccepted, &gin.H{"logged out": "true"})
+		ctx.JSON(http.StatusAccepted, &gin.H{"message": "logged out"})
 	}
 	return fx
 }
