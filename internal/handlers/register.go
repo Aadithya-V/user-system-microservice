@@ -15,16 +15,21 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 	fx := func(ctx *gin.Context) {
 		var newuser models.User
 		if err := ctx.BindJSON(&newuser); err != nil {
-			//ctx.JSON(http., struct{}{})
+			ctx.JSON(http.StatusBadRequest, &gin.H{"error": "registration information not submitted correctly."}) // print json format for reference
 			return
 		}
-		// validate client data
+		// TODO:validate client data? Better done at the client..
 
 		if res := db.Get(CTX, newuser.Name); res.Err() != redis.Nil {
-			return //error status and info
+			ctx.JSON(http.StatusConflict, &gin.H{"error": "Username not available. Already in use."}) //Do you allow reuse of deleted accounts' usernames?
+			return
 		}
 
-		id := db.Incr(CTX, "next_user_id").Val() //err if next_user_id not init in db
+		id, err := db.Incr(CTX, "next_user_id").Result()
+		if err == redis.Nil { //err if next_user_id not init in db
+			ctx.JSON(http.StatusInternalServerError, &gin.H{"error": "unable to create id. DB not initialised."})
+			return
+		}
 		newuser.ID = strconv.FormatInt(id, 10)
 
 		db.HSet(CTX, "users", newuser.Name, newuser.ID)
@@ -40,8 +45,7 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 
 		db.HSet(CTX, "user:"+newuser.ID, "id", newuser.ID, "name", newuser.Name, "dob", newuser.DOB, "address", newuser.Address, "latitude", newuser.Latitude, "longitude", newuser.Longitude, "description", newuser.Description, "createdAt", time.Now(), "pwd", newuser.Pwd)
 
-		ctx.JSON(http.StatusCreated, struct{}{})
-
+		ctx.JSON(http.StatusCreated, &gin.H{"message": "account successfully created."})
 	}
 	return fx
 }
