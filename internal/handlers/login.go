@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/Aadithya-V/user-system-microservice/internal/auth"
 	"github.com/gin-gonic/gin"
@@ -40,8 +41,8 @@ func Login(db *redis.Client) func(ctx *gin.Context) {
 			db.HSet(CTX, "user"+id, "auth", token)
 			db.HSet(CTX, "auths", token, id)
 		}
-
-		ctx.JSON(http.StatusOK, &gin.H{"auth": token})
+		ctx.SetCookie("auth", token, int(time.Now().Unix()+3600*24*365), "", "", false, false)
+		ctx.JSON(http.StatusOK, struct{}{}) //add to header/cookie
 
 	}
 	return fx
