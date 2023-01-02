@@ -34,3 +34,9 @@ func (db *DB) Get(key string) (string, error) {
 
 	return db.Client.Get(ctx, key).Result()
 }
+
+func(ctx *gin.Context) {
+		var user models.User
+		ctx.BindJSON(user)
+		log.Fatal(user)
+	}

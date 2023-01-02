@@ -8,6 +8,7 @@ import (
 	"os/signal"
 
 	"github.com/Aadithya-V/user-system-microservice/internal/database"
+	"github.com/Aadithya-V/user-system-microservice/internal/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
 )
@@ -46,10 +47,10 @@ func initRouter(db *redis.Client) *gin.Engine {
 
 	// Routes mapping
 	//router.POST("/register", controllers.PostRegister)
-	router.GET("/nextuser", func(ctx *gin.Context) {
-		res := db.Get(context.TODO(), "next_user_id")
-		ctx.IndentedJSON(http.StatusOK, res.Val())
-	})
+
+	router.POST("/register", handlers.Register(db))
+	router.POST("/login", handlers.Login(db))
+	//router.GET("/logout", handlers.Logout(db))
 
 	return router
 }
