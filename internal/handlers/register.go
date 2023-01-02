@@ -20,7 +20,7 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 		}
 		// TODO:validate client data? Better done at the client..
 
-		if res := db.Get(CTX, newuser.Name); res.Err() != redis.Nil {
+		if err := db.HGet(CTX, "users", newuser.Name).Err(); err != redis.Nil {
 			ctx.JSON(http.StatusConflict, &gin.H{"error": "Username not available. Already in use."}) //Do you allow reuse of deleted accounts' usernames?
 			return
 		}

@@ -13,9 +13,9 @@ import (
 func Logout(db *redis.Client) func(ctx *gin.Context) {
 	fx := func(ctx *gin.Context) {
 		token, err := ctx.Cookie("auth")
-		if err == http.ErrNoCookie {
+		if err == http.ErrNoCookie { //no cookie received
 			ctx.JSON(http.StatusNotAcceptable, &gin.H{"err": "no auth cookie. Login and/or enable site cookies."})
-			return //no cookie received
+			return
 		}
 
 		id, err := db.HGet(CTX, "auths", token).Result()
