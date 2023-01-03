@@ -48,9 +48,9 @@ func initRouter(db *redis.Client) *gin.Engine {
 	// Routes mapping
 	// add logout, getuser, update, follow, unfollow,followers, following, nearby to authorization group.
 	authorized := router.Group("/user", handlers.TokenAuth(db))
-	authorized.POST("logout", handlers.Logout(db))
+	authorized.POST("/logout", handlers.Logout(db))
 	authorized.GET("/:name", handlers.GetUserByName(db))
-	//authorized.PUT("/update", handlers.UpdateUserDetails(db))
+	authorized.PUT("/update", handlers.UpdateUserDetails(db))
 
 	router.POST("/register", handlers.Register(db))
 	router.POST("/login", handlers.Login(db))
