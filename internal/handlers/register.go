@@ -26,10 +26,22 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 		}
 
 		id, err := db.Incr(CTX, "next_user_id").Result()
-		if err == redis.Nil { //err if next_user_id not init in db
-			ctx.JSON(http.StatusInternalServerError, &gin.H{"error": "unable to create id. DB not initialised."})
+		if err == redis.Nil {
+			ctx.JSON(http.StatusInternalServerError, &gin.H{"error": "unable to create id."})
 			return
+		} /* 	// err != nil cannot ever happen practically (only if size of id string value exceeds 512 MiB).
+		// If next_user_id not initialized in db to desired value, incr starts by returning 1.
+		// Collission will happen if key is mistakenly deleted as 1 will be returned again. All further registrations
+		// thence will be erraneous. So, (is it?) worth testing for only on case ID==1 if an id=1 already exists.
+		if err != nil {
+			log.Fatalf("Fatal Server Shutdown: error with next_user_id in db (mostly overflow): %v", err)
+		} else if id == 1 {
+			if db.HGet(CTX, "user:1", "id").Val() == "1" {
+				log.Fatalf("Fatal Server Shutdown: next_user_id in db is deleted.")
+				return
+			}
 		}
+		*/
 		newuser.ID = strconv.FormatInt(id, 10)
 
 		db.HSet(CTX, "users", newuser.Name, newuser.ID)

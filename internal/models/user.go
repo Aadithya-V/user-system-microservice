@@ -2,7 +2,7 @@ package models
 
 // struct user represents data of user.
 type User struct {
-	ID          string  `json:"id"` //vet bindings later- binding:"required"
+	ID          string  `json:"id"`
 	Name        string  `json:"name" binding:"required"`
 	DOB         string  `json:"dob"`
 	Address     string  `json:"address"`
