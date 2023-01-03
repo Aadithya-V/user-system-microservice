@@ -23,20 +23,21 @@ type Logininfo struct {
 
 func Login(db *redis.Client) func(ctx *gin.Context) {
 	fx := func(ctx *gin.Context) {
+		// TODO: 1) auth token exists in request. 2)one or more auth exists in set user:auths:id. Need policy- how many valid auth tokens can a user hold at a time?
 		var login Logininfo
 		if err := ctx.BindJSON(&login); err != nil {
 			ctx.JSON(http.StatusInternalServerError, &gin.H{"error": "JSON Binding Failed"})
 			return
 		}
 		id, err := db.HGet(CTX, "users", login.Uname).Result()
-		if err != nil {
+		if err == redis.Nil {
 			ctx.JSON(http.StatusNotFound, &gin.H{"error": "Username Incorrect"})
 			return
 		}
 
 		hash := db.HGet(CTX, "user:"+id, "pwd").Val()
 		var token string
-		if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(login.Pwd)); err == nil { // if already logged in update auth tokens
+		if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(login.Pwd)); err == nil {
 			token = auth.GenerateSecureToken(tokenSize)
 			db.HSet(CTX, "user"+id, "auth", token)
 			db.HSet(CTX, "auths", token, id)
