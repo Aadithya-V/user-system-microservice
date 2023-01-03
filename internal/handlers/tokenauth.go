@@ -23,7 +23,7 @@ func TokenAuth(db *redis.Client) func(ctx *gin.Context) {
 			ctx.Abort()
 			return
 		}
-
+		// All subsequent handlers get state from param "id"
 		ctx.AddParam("id", id)
 		ctx.Next()
 	}

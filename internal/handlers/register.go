@@ -55,7 +55,7 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 			Name:      newuser.ID,
 		})
 
-		db.HSet(CTX, "user:"+newuser.ID, "id", newuser.ID, "name", newuser.Name, "dob", newuser.DOB, "address", newuser.Address, "latitude", newuser.Latitude, "longitude", newuser.Longitude, "description", newuser.Description, "createdAt", time.Now(), "pwd", newuser.Pwd)
+		db.HSet(CTX, "user:"+newuser.ID, "id", newuser.ID, "name", newuser.Name, "dob", newuser.DOB, "address", newuser.Address, "latitude", newuser.Latitude, "longitude", newuser.Longitude, "description", newuser.Description, "createdAt", time.Now(), "pwd", newuser.Pwd) // use struct iterator or unroller.
 
 		ctx.JSON(http.StatusCreated, &gin.H{"message": "account successfully created."})
 	}
