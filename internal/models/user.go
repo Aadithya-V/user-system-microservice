@@ -11,5 +11,5 @@ type User struct {
 	Description string  `json:"description"`
 	CreatedAt   string  `json:"createdAt"`
 	Pwd         string  `json:"pwd" binding:"required"`
-	Auth        string  `json:"auth"`
+	Auth        string  `json:"auth"` // remove field when adding multi-login support.
 }

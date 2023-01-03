@@ -23,7 +23,7 @@ type Logininfo struct {
 
 func Login(db *redis.Client) func(ctx *gin.Context) {
 	fx := func(ctx *gin.Context) {
-		// TODO: 1) auth token exists in request. 2)one or more auth exists in set user:auths:id. Need policy- how many valid auth tokens can a user hold at a time?
+		// TODO: 1) auth token exists in request. 2) one or more auth exists in the set user:auths:id. Need policy- how many valid auth tokens can a user hold at a time?
 		var login Logininfo
 		if err := ctx.BindJSON(&login); err != nil {
 			ctx.JSON(http.StatusInternalServerError, &gin.H{"error": "JSON Binding Failed"})

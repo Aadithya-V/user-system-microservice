@@ -23,7 +23,7 @@ func Logout(db *redis.Client) func(ctx *gin.Context) {
 			ctx.JSON(http.StatusUnauthorized, &gin.H{"err": "wrong auth credential."})
 			return
 		}
-		// logout by deleting auth entries in db
+		// logout by deleting current auth entry in db- TODO: del from set user:auths:id.
 		db.HDel(CTX, "auths", token)
 		db.HDel(CTX, "user:"+id, "auth")
 		// delete cookie

@@ -79,6 +79,7 @@ Redis Data Layout:
 				  	improve performance as size of indices M increases.
 				 	Efficiency of O(N + log M) for search by radius.
 
+	TODO-   Add set/sorted set user:auths:id to keep track of multiple logins and auth tokens.
 */
 
 // shortcut to pass ctx generally.
