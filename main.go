@@ -46,11 +46,20 @@ func initRouter(db *redis.Client) *gin.Engine {
 	router := gin.Default()
 
 	// Routes mapping
+	// add logout, getuser, update, follow, unfollow,followers, following, nearby to authorization group.
+	authorized := router.Group("/user", handlers.TokenAuth(db))
+	authorized.POST("logout", handlers.Logout(db))
+	authorized.GET("/:name", handlers.GetUserByName(db))
+	//authorized.PUT("/update", handlers.UpdateUserDetails(db))
+
 	router.POST("/register", handlers.Register(db))
 	router.POST("/login", handlers.Login(db))
-	router.Any("/logout", handlers.Logout(db))
-	router.GET("/users/:name", handlers.GetUserByName(db))
 
+	//router.POST("/user/follow/:name", )
+	//router.POST("/user/unfollow/:name")
+	//router.GET("/user/:name/followers", )	// GET("/user/:id") too should retrieve follows.
+	//router.GET("/user/:name/following", )
+	//router.GET("/user/nearby")
 	return router
 }
 
@@ -63,6 +72,7 @@ func startHttpServer(router *gin.Engine) {
 	idleConnsClosed := make(chan struct{})
 
 	go func() {
+		// for graceful shutdown..
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt)
 		<-sigint
