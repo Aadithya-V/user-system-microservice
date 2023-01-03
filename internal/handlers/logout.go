@@ -19,7 +19,7 @@ func Logout(db *redis.Client) func(ctx *gin.Context) {
 		db.HDel(CTX, "user:"+id, "auth")
 		// delete cookie
 		ctx.SetCookie("auth", "", int(time.Unix(0, 0).Unix()), "", "", false, false)
-		ctx.JSON(http.StatusAccepted, &gin.H{"message": "logged out"})
+		ctx.JSON(http.StatusOK, &gin.H{"message": "logged out"})
 	}
 	return fx
 }
