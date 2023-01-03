@@ -5,8 +5,11 @@ import (
 	"github.com/go-redis/redis/v9"
 )
 
-func name(db *redis.Client) func(ctx *gin.Context) {
+func UpdateUserDetails(db *redis.Client) func(ctx *gin.Context) {
 	fx := func(ctx *gin.Context) {
+		/*
+
+		 */
 
 	}
 
