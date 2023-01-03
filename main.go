@@ -51,12 +51,12 @@ func initRouter(db *redis.Client) *gin.Engine {
 	authorized.POST("/logout", handlers.Logout(db))
 	authorized.GET("/:name", handlers.GetUserByName(db))
 	authorized.PUT("/update", handlers.UpdateUserDetails(db))
+	authorized.POST("/:name/follow", handlers.FollowUser(db))
+	authorized.POST("/:name/unfollow", handlers.UnfollowUser(db))
 
 	router.POST("/register", handlers.Register(db))
 	router.POST("/login", handlers.Login(db))
 
-	//router.POST("/user/follow/:name", )
-	//router.POST("/user/unfollow/:name")
 	//router.GET("/user/:name/followers", )	// GET("/user/:id") too should retrieve follows.
 	//router.GET("/user/:name/following", )
 	//router.GET("/user/nearby")

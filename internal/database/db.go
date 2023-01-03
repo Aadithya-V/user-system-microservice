@@ -55,15 +55,17 @@ Redis Data Layout:
 
 			(followers:[id] UNIXtime id ...)
 
-			Each key represents a user whose followers contained in its sorted set
-			sorted by the UNIX time at which the user was followed by the user represented by id field
+			Each key (read as "followers of [user:id]") represents a user whose followers are contained in its sorted set
+			sorted by the UNIX time at which the user was followed by the user represented by the id value.
 
 
 		6) key:- following:[id]
 
 			(following:[id] UNIXtime id ...)
 
-			Similar to 5, but the reverse. Sorted set of users and the users followed by them.
+			Similar to 5, but the reverse. Sorted set of user:[id] and the users followed by them.
+
+		note: when a user 1 follows a user 2, add user 2 to 6) and user 1 to 5).
 
 
 	GeoSpatial Indices
