@@ -1,8 +1,8 @@
 # user-system-microservice
 
-Tech Stack: Go + Redis.
+Production grade solution for managing users (with authentication, follow and geolocation mechanisms) of dynamic web applications.
 
-Go Libraries used: gin-gonic, go-redis
+Written in "go" using Gin with Redis as the in-memory datastore.
 
 Database schema defined at- https://github.com/Aadithya-V/user-system-microservice/blob/master/internal/database/db.go
 
