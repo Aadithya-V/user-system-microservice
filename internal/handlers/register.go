@@ -19,6 +19,11 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 			return
 		}
 		// TODO:validate client data? Better done at the client..
+		lat, lon := newuser.Coordinates[0], newuser.Coordinates[1]
+		if err := validateCoordinates(lat, lon); err != nil || newuser.Coordinates == NULLISLAND {
+			ctx.JSON(http.StatusBadRequest, &gin.H{"error": err.Error()}) // Received Invalid Coordinates
+			return
+		}
 
 		if err := db.HGet(CTX, "users", newuser.Name).Err(); err != redis.Nil {
 			ctx.JSON(http.StatusConflict, &gin.H{"error": "Username not available. Already in use."}) //Do you allow reuse of deleted accounts' usernames?
@@ -49,18 +54,13 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 		hash, _ := bcrypt.GenerateFromPassword([]byte(newuser.Pwd), bcrypt.DefaultCost)
 		newuser.Pwd = string(hash)
 
-		// possible errors: invalid coordinates,
-		err = db.GeoAdd(CTX, "locations", &redis.GeoLocation{
-			Longitude: newuser.Coordinates[1],
-			Latitude:  newuser.Coordinates[0],
+		db.GeoAdd(CTX, "locations", &redis.GeoLocation{
+			Longitude: lon,
+			Latitude:  lat,
 			Name:      newuser.ID,
-		}).Err()
-		if err != nil { // now that registration can be halted mid-track, it should be made one trasaction (in this approach, user id cannot be decremented(concurrency unsafe) and unnecessary rollbacks. -> see)..or validate first at the beginning- database is queried less and user_ids dont become discontinuous due to aborted transactions.
-			ctx.JSON(http.StatusNotAcceptable, &gin.H{"error": "wrong coordinates."})
-			return
-		}
+		})
 
-		db.HSet(CTX, "user:"+newuser.ID, "id", newuser.ID, "name", newuser.Name, "dob", newuser.DOB, "address", newuser.Address, "latitude", newuser.Coordinates[0], "longitude", newuser.Coordinates[1], "description", newuser.Description, "createdAt", time.Now(), "pwd", newuser.Pwd) // use struct iterator or unroller.
+		db.HSet(CTX, "user:"+newuser.ID, "id", newuser.ID, "name", newuser.Name, "dob", newuser.DOB, "address", newuser.Address, "latitude", lat, "longitude", lon, "description", newuser.Description, "createdAt", time.Now(), "pwd", newuser.Pwd) // use struct iterator or unroller.
 
 		ctx.JSON(http.StatusCreated, &gin.H{"message": "account successfully created."})
 	}
