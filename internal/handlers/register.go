@@ -49,13 +49,18 @@ func Register(db *redis.Client) func(ctx *gin.Context) {
 		hash, _ := bcrypt.GenerateFromPassword([]byte(newuser.Pwd), bcrypt.DefaultCost)
 		newuser.Pwd = string(hash)
 
-		db.GeoAdd(CTX, "locations", &redis.GeoLocation{
-			Longitude: newuser.Longitude,
-			Latitude:  newuser.Latitude,
+		// possible errors: invalid coordinates,
+		err = db.GeoAdd(CTX, "locations", &redis.GeoLocation{
+			Longitude: newuser.Coordinates[1],
+			Latitude:  newuser.Coordinates[0],
 			Name:      newuser.ID,
-		})
+		}).Err()
+		if err != nil { // now that registration can be halted mid-track, it should be made one trasaction (in this approach, user id cannot be decremented(concurrency unsafe) and unnecessary rollbacks. -> see)..or validate first at the beginning- database is queried less and user_ids dont become discontinuous due to aborted transactions.
+			ctx.JSON(http.StatusNotAcceptable, &gin.H{"error": "wrong coordinates."})
+			return
+		}
 
-		db.HSet(CTX, "user:"+newuser.ID, "id", newuser.ID, "name", newuser.Name, "dob", newuser.DOB, "address", newuser.Address, "latitude", newuser.Latitude, "longitude", newuser.Longitude, "description", newuser.Description, "createdAt", time.Now(), "pwd", newuser.Pwd) // use struct iterator or unroller.
+		db.HSet(CTX, "user:"+newuser.ID, "id", newuser.ID, "name", newuser.Name, "dob", newuser.DOB, "address", newuser.Address, "latitude", newuser.Coordinates[0], "longitude", newuser.Coordinates[1], "description", newuser.Description, "createdAt", time.Now(), "pwd", newuser.Pwd) // use struct iterator or unroller.
 
 		ctx.JSON(http.StatusCreated, &gin.H{"message": "account successfully created."})
 	}
