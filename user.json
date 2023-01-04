@@ -5,6 +5,5 @@
     "pwd": "",
 
     "address": "",
-    "latitude": null,
-    "longitude": null
+    "coordinates": [0,0]
 }

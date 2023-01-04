@@ -5,7 +5,7 @@ type User struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name" binding:"required"`
 	DOB         string  `json:"dob"`
-	Address     string  `json:"address"`
+	Address     string  `json:"address"` //change to arr of strings
 	Latitude    float64 `json:"latitude" binding:"required"`
 	Longitude   float64 `json:"longitude" binding:"required"`
 	Description string  `json:"description"`
@@ -16,14 +16,15 @@ type User struct {
 
 // struct UpdatableUser represents only those data of users that are updatable.
 type UpdatableUser struct {
-	Description string  `json:"description"`
-	Address     string  `json:"address"`
-	Latitude    float64 `json:"latitude"`
-	Longitude   float64 `json:"longitude"`
-	Pwd         string  `json:"pwd"`
+	Description string     `json:"description"`
+	Address     string     `json:"address"`
+	Coordinates [2]float64 `json:"coordinates"`
+	Pwd         string     `json:"pwd"`
 }
 
 /* // pass *struct as parameter s
 func StructIterator(s any) {
 
 } */
+
+// add bindJSON as receiver method to above structs.

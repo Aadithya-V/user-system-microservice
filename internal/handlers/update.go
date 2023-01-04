@@ -20,12 +20,34 @@ func UpdateUserDetails(db *redis.Client) func(ctx *gin.Context) {
 		// Binding data.
 		var updatedUser models.UpdatableUser
 		if err := ctx.BindJSON(&updatedUser); err != nil { // error not as I expected. Review. Extra fields ignored. Check if JSONpatch the only perfect soln?
-			ctx.JSON(http.StatusBadRequest, &gin.H{"error": "Received information for unupdatable fields."}) // print json format for reference
+			ctx.JSON(http.StatusBadRequest, &gin.H{"error": "Incorrect updation information format."}) // print json format for reference
 			return
 		}
 		id := ctx.Param("id")
+
 		// replace below unrolled loop with struct iterator.
-		var tracker bool = false
+		tracker := false
+
+		// Always check the coordinates first. If checked later after other db updates and coor is found to be invalid,
+		// the entire updation process till then should have to performed as a transaction and rolled back.
+		if updatedUser.Coordinates != NULLISLAND { // since float64 "comparable"
+			// Validate coord
+			lat, lon := updatedUser.Coordinates[0], updatedUser.Coordinates[1]
+
+			if err := validateCoordinates(lat, lon); err != nil {
+				ctx.JSON(http.StatusBadRequest, &gin.H{"error": err.Error()}) // Received Invalid Coordinates
+				return
+			}
+
+			db.GeoAdd(CTX, "locations", &redis.GeoLocation{
+				Latitude:  lat,
+				Longitude: lon,
+				Name:      id,
+			})
+			// not adding coord to hash user:id coordinates as I might remove that filed soon.
+
+			tracker = true
+		}
 
 		if updatedUser.Pwd != "" { // if pwd updated, delete all auth tokens, ie, log out all user's log-ins
 			hash, _ := bcrypt.GenerateFromPassword([]byte(updatedUser.Pwd), bcrypt.DefaultCost)
@@ -39,22 +61,6 @@ func UpdateUserDetails(db *redis.Client) func(ctx *gin.Context) {
 		}
 		if updatedUser.Address != "" {
 			db.HSet(CTX, "user:"+id, "address", updatedUser.Address)
-			tracker = true
-		}
-		if updatedUser.Latitude != 0.0 {
-			db.HSet(CTX, "user:"+id, updatedUser.Latitude)
-			db.GeoAdd(CTX, "locations", &redis.GeoLocation{
-				Latitude: updatedUser.Latitude,
-				Name:     id,
-			})
-			tracker = true
-		}
-		if updatedUser.Longitude != 0.0 {
-			db.HSet(CTX, "user:"+id, updatedUser)
-			db.GeoAdd(CTX, "locations", &redis.GeoLocation{
-				Longitude: updatedUser.Longitude,
-				Name:      id,
-			})
 			tracker = true
 		}
 
