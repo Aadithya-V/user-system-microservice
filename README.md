@@ -8,4 +8,4 @@ Database schema defined at- https://github.com/Aadithya-V/user-system-microservi
 
 API defined informally in the package; strict definition and test cases to be added from Postman soon.
 
-Implements basic-auth and token-bearer authentication systems that are stateless, in-tune with REST principles.
+Implements basic-auth (useing Provos and Mazières's bcrypt adaptive hashing algorithm) and token-bearer authentication systems that are stateless, in-tune with REST principles.
