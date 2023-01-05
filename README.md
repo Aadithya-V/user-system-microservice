@@ -1,6 +1,6 @@
 # user-system-microservice
 
-Production grade solution for managing users (with authentication, follow and geolocation mechanisms) of dynamic web applications.
+Solution for managing users (with authentication, follow and geolocation mechanisms) of dynamic web applications.
 
 Written in "go" using Gin with Redis as the in-memory datastore.
 
